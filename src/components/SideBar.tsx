@@ -1,36 +1,51 @@
-import { Button } from "./Button";
+import { memo } from "react";
+import { MovieCard } from "./MovieCard";
 
-interface SideBarProps {
-  genres: Array<{
+interface ContentProps {
+  selectedGenre: {
     id: number;
-    name: 'action' | 'comedy' | 'documentary' | 'drama' | 'horror' | 'family';
+    name: "action" | "comedy" | "documentary" | "drama" | "horror" | "family";
     title: string;
+  };
+
+  movies: Array<{
+    imdbID: string;
+    Title: string;
+    Poster: string;
+    Ratings: Array<{
+      Source: string;
+      Value: string;
+    }>;
+    Runtime: string;
   }>;
-  selectedGenreId: number;
-  buttonClickCallback: (args: any) => void;
 }
 
-export function SideBar({
-  genres,
-  selectedGenreId,
-  buttonClickCallback
-}: SideBarProps) {
+const ContentComponent = ({ selectedGenre, movies }: ContentProps) => {
   return (
-    <nav className="sidebar">
-      <span>Watch<p>Me</p></span>
+    <div className="container">
+      <header>
+        <span className="category">
+          Categoria:<span> {selectedGenre.title}</span>
+        </span>
+      </header>
 
-      <div className="buttons-container">
-        {genres.map(genre => (
-          <Button
-            key={String(genre.id)}
-            title={genre.title}
-            iconName={genre.name}
-            onClick={() => buttonClickCallback(genre.id)}
-            selected={selectedGenreId === genre.id}
-          />
-        ))}
-      </div>
+      <main>
+        <div className="movies-list">
+          {movies.map((movie) => (
+            <MovieCard
+              key={movie.imdbID}
+              title={movie.Title}
+              poster={movie.Poster}
+              runtime={movie.Runtime}
+              rating={movie.Ratings[0].Value}
+            />
+          ))}
+        </div>
+      </main>
+    </div>
+  );
+};
 
-    </nav>
-  )
-}
+export const Content = memo(ContentComponent, (prevProps, nextProps) => {
+  return Object.is(prevProps.movies, nextProps.movies);
+});
